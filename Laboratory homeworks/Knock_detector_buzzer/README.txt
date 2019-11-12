@@ -1,0 +1,1 @@
+In this homework I used a passive piezo buzzer to detect the vibration of a knock. When it detects the knock, after 5 seconds an active piezo buzzer starts a tone.
