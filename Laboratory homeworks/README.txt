@@ -5,3 +5,5 @@
 3rd Homework: Control a RGB LED with 3 Potentiometers - file is in the Lab_2 folder
 
 4th Homework: Knock detector buzzer - when detecting a knock with a passive buzzer, after 5 second an active one starts a tone.
+
+5th Homework: Control a display with 4 7 segments displays with a joystick.

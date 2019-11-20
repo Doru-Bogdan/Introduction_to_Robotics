@@ -1,0 +1,1 @@
+In this homework, I can control each 7 segments display with a joystick. On x axis I can change the digit, and on y axis I can change the display.
