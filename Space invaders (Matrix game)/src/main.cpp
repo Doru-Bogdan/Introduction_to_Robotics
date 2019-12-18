@@ -35,6 +35,8 @@ boolean levelDeployed = false;
 boolean gameOver = false;
 boolean levelComplete = false;
 boolean hasGameStarted = false;
+boolean nrLivesHasBeenChanged = false;
+boolean levelHasBeenChanged = false;
 
 // ------------ variables for the lcd display ------------------
 
@@ -64,6 +66,7 @@ int flag = 0;
 int flag1 = 0;
 int Score = 0;
 int highScore = 0;
+int currentPositionSettings = 1;
 
 unsigned long lastDebounceTime = 0;
 unsigned long treshholdTime = 50;
@@ -72,9 +75,9 @@ unsigned long pressingTime = 0;
 unsigned long startGameTime = 0;
 unsigned long gameOverTime = 0;
 
-const String textMenu[] = {" Start", ">Start", " High Score", ">High Score",
+const String textMenu[] = {" Start", ">Start", " HighScore", ">HighScore",
                            " Settings", ">Settings", "Lives:", "Level:", "Score:",
-                           "HighScore:", "Starting level:"};
+                           "HighScore:", "Starting level:", " Level:", ">Level:", " Lives:", ">Lives:", " Info", ">Info"};
 
 LiquidCrystal lcd(RSPin, EPin, D4Pin, D5Pin, D6Pin, D7Pin);
 
@@ -143,7 +146,7 @@ void resetLevel()
   {
     resetMatrix();
     levelDeployed = false;
-    gameOver = false;
+    //gameOver = false;
     levelComplete = false;
     for (int row = 0; row < 8; row++)
     {
@@ -154,8 +157,8 @@ void resetLevel()
       level += 1;
       increaseDificulty();
     }
+    gameOver = false;
     showShip();
-    //Serial.println("fct reset");
   }
 }
 
@@ -421,20 +424,55 @@ void readXAxis()
     }
     else
     {
-      currentPositionMenu1 = 3;
+      currentPositionMenu1 = 4;
     }
     joyMoved = true;
   }
 
   if (xValue > maxThreshold && joyMoved == false)
   {
-    if (currentPositionMenu1 < 3)
+    if (currentPositionMenu1 < 4)
     {
       currentPositionMenu1++;
     }
     else
     {
       currentPositionMenu1 = 1;
+    }
+    joyMoved = true;
+  }
+
+  if (xValue >= minThreshold && xValue <= maxThreshold)
+  {
+    joyMoved = false;
+  }
+}
+
+void readXAxisForSettings()
+{
+  int xValue = analogRead(joyX);
+  if (xValue < minThreshold && joyMoved == false)
+  {
+    if (currentPositionSettings > 1)
+    {
+      currentPositionSettings--;
+    }
+    else
+    {
+      currentPositionSettings = 2;
+    }
+    joyMoved = true;
+  }
+
+  if (xValue > maxThreshold && joyMoved == false)
+  {
+    if (currentPositionSettings < 2)
+    {
+      currentPositionSettings++;
+    }
+    else
+    {
+      currentPositionSettings = 1;
     }
     joyMoved = true;
   }
@@ -453,10 +491,12 @@ void changeLevel()
     if (level < 5)
     {
       level++;
+      levelHasBeenChanged = true;
     }
     else
     {
       level = 1;
+      levelHasBeenChanged = true;
     }
     YjoyMoved = true;
   }
@@ -466,10 +506,51 @@ void changeLevel()
     if (level > 1)
     {
       level--;
+      levelHasBeenChanged = true;
     }
     else
     {
       level = 5;
+      levelHasBeenChanged = true;
+    }
+    YjoyMoved = true;
+  }
+
+  if (yValue >= minThreshold && yValue <= maxThreshold)
+  {
+    YjoyMoved = false;
+  }
+}
+
+void changeNrLives()
+{
+  int yValue = analogRead(joyY);
+  if (yValue < minThreshold && YjoyMoved == false)
+  {
+    if (nrLives < 3)
+    {
+      nrLives++;
+      nrLivesHasBeenChanged = true;
+    }
+    else
+    {
+      nrLives = 1;
+      nrLivesHasBeenChanged = true;
+    }
+    YjoyMoved = true;
+  }
+
+  if (yValue > maxThreshold && YjoyMoved == false)
+  {
+    if (nrLives> 1)
+    {
+      nrLives--;
+      nrLivesHasBeenChanged = true;
+    }
+    else
+    {
+      nrLives = 3;
+      nrLivesHasBeenChanged = true;
     }
     YjoyMoved = true;
   }
@@ -523,11 +604,41 @@ void exitMenu()
 
 void settingsMenu()
 {
-  lcd.setCursor(0, 0);
-  lcd.print("Level:");
-  lcd.print(level);
-  changeLevel();
-  exitMenu();
+  readXAxisForSettings();
+  switch (currentPositionSettings)
+  {
+  case 1:
+    lcd.setCursor(1, 0);
+    lcd.print(textMenu[12]);
+    lcd.print(level);
+    lcd.setCursor(1, 1);
+    lcd.print(textMenu[13]);
+    lcd.print(nrLives);
+    changeLevel();
+    exitMenu();
+    break;
+  
+  case 2:
+    lcd.setCursor(1, 0);
+    lcd.print(textMenu[11]);
+    lcd.print(level);
+    lcd.setCursor(1, 1);
+    lcd.print(textMenu[14]);
+    lcd.print(nrLives);
+    changeNrLives();
+    exitMenu();
+    break;
+
+  default:
+    currentPositionSettings = 1;
+    break;
+  }
+
+  // lcd.setCursor(0, 0);
+  // lcd.print("Level:");
+  // lcd.print(level);
+  // changeLevel();
+  // exitMenu();
 }
 
 void highScoreMenu()
@@ -627,8 +738,10 @@ void principalMenu()
     lcd.print(textMenu[1]);
     lcd.setCursor(7, 0);
     lcd.print(textMenu[4]);
-    lcd.setCursor(2, 1);
+    lcd.setCursor(0, 1);
     lcd.print(textMenu[2]);
+    lcd.setCursor(11, 1);
+    lcd.print(textMenu[15]);
     break;
 
   case 2: //Settings
@@ -636,8 +749,10 @@ void principalMenu()
     lcd.print(textMenu[0]);
     lcd.setCursor(7, 0);
     lcd.print(textMenu[5]);
-    lcd.setCursor(2, 1);
+    lcd.setCursor(0, 1);
     lcd.print(textMenu[2]);
+    lcd.setCursor(11, 1);
+    lcd.print(textMenu[15]);
     break;
 
   case 3: //High score
@@ -645,9 +760,23 @@ void principalMenu()
     lcd.print(textMenu[0]);
     lcd.setCursor(7, 0);
     lcd.print(textMenu[4]);
-    lcd.setCursor(2, 1);
+    lcd.setCursor(0, 1);
     lcd.print(textMenu[3]);
+    lcd.setCursor(11, 1);
+    lcd.print(textMenu[15]);
     break;
+
+   case 4:
+    lcd.setCursor(0, 0);
+    lcd.print(textMenu[0]);
+    lcd.setCursor(7, 0);
+    lcd.print(textMenu[4]);
+    lcd.setCursor(0, 1);
+    lcd.print(textMenu[2]);
+    lcd.setCursor(11, 1);
+    lcd.print(textMenu[16]);
+    break;
+
   }
 
   if (millis() - pressingTime >= 250 || pressingTime == 0)
@@ -660,7 +789,12 @@ void principalMenu()
         Score = 0;
         isRefreshed = false;
         pressingTime = millis();
-        nrLives = 3;
+        if (!nrLivesHasBeenChanged)
+          nrLives = 3;
+        nrLivesHasBeenChanged = false;
+        if (!levelHasBeenChanged)
+          level = 1;
+        levelHasBeenChanged = false;
         lcd.clear();
         showShip();
         levelComplete = false;
@@ -683,8 +817,24 @@ void principalMenu()
         pressingTime = millis();
         lcd.clear();
       }
+
+      if (currentPositionMenu1 == 4)
+      {
+        position = 4;
+        pressingTime = millis();
+        lcd.clear();
+      }
     }
   }
+}
+
+void infoMenu()
+{
+  lcd.setCursor(0, 0);
+  lcd.print("Space Invaders");
+  lcd.setCursor(0, 1);
+  lcd.print("@UnibucRobotics");
+  exitMenu();
 }
 
 void setup()
@@ -722,6 +872,10 @@ void loop()
 
   case 3:
     highScoreMenu();
+    break;
+  
+  case 4:
+    infoMenu();
     break;
 
   default:
