@@ -9,14 +9,14 @@
  Each time the player dies, the score will be reset to 0 and he will restart the current level he was in.
 
 #### Hardware requirements:
-- Arduino board (here is used an Arduino Uno)\s\s
-- 8x8 LED matrix\s\s
-- LCD display\s\s
-- Joystick\s\s
-- MAX7219 Driver\s\s
-- 3 breadboards\s\s
-- a lot of wires\s\s
+- Arduino board (here is used an Arduino Uno)
+- 8x8 LED matrix
+- LCD display
+- Joystick
+- MAX7219 Driver
+- 3 breadboards
+- a lot of wires
 
 #### Presentation links:
-VIDEO: https://drive.google.com/open?id=1n-4IrLlqQS8ewkhgFeviOg5lJMibZ_G3
+VIDEO: https://drive.google.com/open?id=1n-4IrLlqQS8ewkhgFeviOg5lJMibZ_G3  
 PHOTOS OF PROJECT: https://imgur.com/gallery/4C08HCF
